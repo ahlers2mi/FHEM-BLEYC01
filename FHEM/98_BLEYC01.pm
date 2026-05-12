@@ -38,12 +38,14 @@ sub BLEYC01_Initialize {
 
 }
 
-sub BLEYC01_setNotfiyDev($) {
+sub BLEYC01_setNotifyDev($) {
   my ($hash) = @_;
 
   if( $hash->{DEVICE} ) {
+    $hash->{NOTIFYDEV} = $hash->{DEVICE};
     notifyRegexpChanged($hash,$hash->{DEVICE});
   } else {
+    $hash->{NOTIFYDEV} = "";
     notifyRegexpChanged($hash,'');
   }
 }
@@ -188,7 +190,7 @@ sub BLEYC01_updateDevices($) {
     }
   }
 
-  InternalTimer(gettimeofday(), "BLEYC01_setNotfiyDev", $hash);
+  InternalTimer(gettimeofday(), "BLEYC01_setNotifyDev", $hash);
   $hash->{CONTENT} = \%list;
 
   BLEYC01_update($hash, undef);
@@ -198,7 +200,7 @@ sub BLEYC01_updateDevices($) {
 sub BLEYC01_Define {
     my ($hash, $def) = @_;
     my @param = split('[ \t]+', $def);
-    $hash->{FVERSION} = "98_BLEYC01.pm:v1.3.0";
+    $hash->{FVERSION} = "98_BLEYC01.pm:v1.4.0";
 
     if(int(@param) != 3) {
         return "too few parameters: define <name> BLEYC01 <device>:<reading>";

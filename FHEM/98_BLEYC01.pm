@@ -211,8 +211,10 @@ sub BLEYC01_Define {
 
     if( $init_done ) {
       BLEYC01_updateDevices($hash);
+    } else {
+      # Während Startup: auf INITIALIZED warten
+      $hash->{NOTIFYDEV} = "global";
     }
-
 
     return undef;
 }
@@ -288,11 +290,17 @@ sub BLEYC01_Attr {
 }
 
 sub BLEYC01_Notify($$) {
-
   my ($own_hash, $dev_hash) = @_;
-  my $ownName = $own_hash->{NAME}; # own name / hash
-  my $eventsNew = [];
-  my $hexstring = "";
+  my $ownName = $own_hash->{NAME};
+
+  # Globale INITIALIZED / REREADCFG Events abfangen
+  if( $dev_hash->{NAME} eq "global" ) {
+    my $events = deviceEvents($dev_hash, 1);
+    if( grep { /^INITIALIZED$|^REREADCFG$/ } @{$events} ) {
+      BLEYC01_updateDevices($own_hash);
+    }
+    return undef;
+  }
 
   Log3 $ownName, 4, "$ownName: Event for $dev_hash->{NAME}";
 
